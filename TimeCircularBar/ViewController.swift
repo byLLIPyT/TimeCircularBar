@@ -48,6 +48,12 @@ class ViewController: UIViewController {
     
     var timer = Timer()
     var durationTimer = 10
+    let shapeLayer = CAShapeLayer()
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.animatedCircular()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +65,7 @@ class ViewController: UIViewController {
 
     @objc func timerStart() {
         
+        basicAnimation()
         timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(changeTime), userInfo: nil, repeats: true)
         print("go")
     }
@@ -67,10 +74,40 @@ class ViewController: UIViewController {
         
         durationTimer -= 1
         cloclLabel.text = "\(durationTimer)"
-        
-        if durationTimer == 0 {
+        if durationTimer <= 0 {
             timer.invalidate()
+            durationTimer = 10
+            cloclLabel.text = "\(durationTimer)"
         }
+    }
+    
+    // MARK: ANIMATION
+    
+    func animatedCircular() {
+        
+        let center = CGPoint(x: shapeView.frame.width / 2, y: shapeView.frame.height / 2)
+        let endAngle = (-CGFloat.pi / 2)
+        let startAngle = 2 * CGFloat.pi + endAngle
+        let circularPath = UIBezierPath(arcCenter: center, radius: 138, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        
+        shapeLayer.path = circularPath.cgPath
+        shapeLayer.lineWidth = 21
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeEnd = 1
+        shapeLayer.lineCap = CAShapeLayerLineCap.round
+        shapeLayer.strokeColor = #colorLiteral(red: 0.9411764741, green: 0.4980392158, blue: 0.3529411852, alpha: 1).cgColor
+        shapeView.layer.addSublayer(shapeLayer)
+    }
+    
+    func basicAnimation() {
+        
+        let basicAnimation = CABasicAnimation(keyPath: "strokeEnd")
+        
+        basicAnimation.toValue = 0
+        basicAnimation.duration = CFTimeInterval(durationTimer)
+        basicAnimation.fillMode = CAMediaTimingFillMode.forwards
+        basicAnimation.isRemovedOnCompletion = true
+        shapeLayer.add(basicAnimation, forKey: "basicAnimation")
     }
 }
 
